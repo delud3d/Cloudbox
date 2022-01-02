@@ -26,14 +26,16 @@ ExecStart=/usr/bin/rclone mount \
   --rc \
   --rc-addr=localhost:5572 \
   --fast-list \
+  --use-mmap \
   --drive-skip-gdocs \
-  --vfs-read-chunk-size=64M \
-  --vfs-read-chunk-size-limit=2048M \
-  --buffer-size=64M \
-  --poll-interval=1m \
-  --dir-cache-time=168h \
+  --drive-acknowledge-abuse \
+  --vfs-cache-mode=full \
+  --vfs-cache-max-age=504h \
+  --vfs-cache-max-size=4T \
+  --vfs-read-ahead=256M \
+  --poll-interval=30s \
+  --dir-cache-time=1000h \
   --timeout=10m \
-  --drive-chunk-size=64M \
   --umask=002 \
   --syslog \
   -v \

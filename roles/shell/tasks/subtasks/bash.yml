@@ -43,11 +43,11 @@
 
   when: not home_bashrc.stat.exists
 
-- name: Bash | Set default editor to nano in '.bashrc'
+- name: Bash | Set default editor to vim in '.bashrc'
   lineinfile:
     dest: "/home/{{ user.name }}/.bashrc"
     regexp: "^export EDITOR="
-    line: "export EDITOR=nano"
+    line: "export EDITOR=vim"
     state: present
 
 - name: Bash | Set bash as default shell

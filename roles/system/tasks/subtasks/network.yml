@@ -14,6 +14,7 @@
     name:
       - vnstat
       - pciutils
+      - irqbalance
 
 - name: Network | Network Tasks Block
   block:
@@ -52,13 +53,14 @@
       create: no
       marker: "### {mark} CLOUDBOX MANAGED BLOCK ###"
       block: |
-        /sbin/ifconfig {{ ansible_default_ipv4.interface }} txqueuelen 10000
-        ethtool -G {{ ansible_default_ipv4.interface }} rx 4096 tx 4096
-        ethtool -K {{ ansible_default_ipv4.interface }} tso off tx off
+        # Don't set these too high, or it will lead to buffer bloat. Only increase if there is a problem.
+        #/sbin/ifconfig {{ ansible_default_ipv4.interface }} txqueuelen 10000
+        #ethtool -G {{ ansible_default_ipv4.interface }} rx 1024 tx 1024
+        ethtool -G {{ ansible_default_ipv4.interface }} rx 1024 tx 256
       insertbefore: "^exit 0"
       owner: "root"
       group: "root"
       mode: 0755
-    when: ('I218' in nic.stdout) or ('I219' in nic.stdout)
+    when: ('I210' in nic.stdout)
 
   when: (ansible_default_ipv4 is defined) and (ansible_default_ipv4.type == "ether")
