@@ -52,6 +52,7 @@
     - /opt/nginx-proxy/certs
     - /opt/nginx-proxy/htpasswd
     - /opt/nginx-proxy/vhost.d
+    - /opt/nginx-proxy/acme.sh
 
 - name: Check if 'proxy.conf' file exists
   stat:
@@ -77,7 +78,7 @@
 - name: Create and start container
   docker_container:
     name: nginx-proxy
-    image: "jwilder/nginx-proxy:0.9.0"
+    image: "jwilder/nginx-proxy:0.9.3"
     pull: yes
     published_ports:
       - "80:80"
@@ -91,7 +92,7 @@
       - "/usr/share/nginx/html"
       - "/opt/nginx-proxy/proxy.conf:/etc/nginx/conf.d/proxy.conf:ro"
     labels:
-      "com.github.jrcs.letsencrypt_nginx_proxy_companion.nginx_proxy": "true"
+      "com.github.nginx-proxy.acme-companion.nginx_proxy": "true"
       "com.github.cloudbox.cloudbox_managed": "true"
     networks:
       - name: cloudbox
@@ -104,18 +105,21 @@
 - name: Create and start letsencrypt container
   docker_container:
     name: letsencrypt
-    image: "jrcs/letsencrypt-nginx-proxy-companion:v1.13.1"
+    image: "nginxproxy/acme-companion:2.1"
     pull: yes
     volumes:
       - "/etc/localtime:/etc/localtime:ro"
       - "/opt/nginx-proxy/certs:/etc/nginx/certs:rw"
       - "/opt/nginx-proxy/vhost.d:/etc/nginx/vhost.d:rw"
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "/opt/nginx-proxy/acme.sh:/etc/acme.sh"
     volumes_from:
       - "nginx-proxy"
     env:
       FILES_UID: "{{ uid }}"
       FILES_GID: "{{ gid }}"
+      ACME_CA_URI: "https://acme.zerossl.com/v2/DV90"
+      ZEROSSL_API_KEY: "{{ zerossl.apikey }}"
     labels:
       "com.github.cloudbox.cloudbox_managed": "true"
     networks:
